@@ -371,7 +371,6 @@ def load_model():
 # ─── Hero ────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <div class="hero-badge">🌿 AI-Powered Diagnostics</div>
     <h1 class="hero-title">Leaf<em>Scan</em></h1>
     <p class="hero-sub">Upload a plant leaf image to instantly detect diseases<br>across pepper, potato &amp; tomato crops</p>
 </div>
@@ -427,27 +426,7 @@ if uploaded_file is not None:
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Top-5 breakdown ──
-    top5_idx   = np.argsort(prediction[0])[::-1][:5]
-    top5_probs = prediction[0][top5_idx]
 
-    rows_html = ""
-    for idx, prob in zip(top5_idx, top5_probs):
-        name    = CLASS_NAMES[idx]
-        pct     = prob * 100
-        bar_w   = pct                           # max 100
-        bold    = "color:#e8ede9;" if idx == pred_index else ""
-        rows_html += f"""
-        <div class="pred-row">
-            <span class="pred-name" style="{bold}">{name}</span>
-            <div class="pred-bar-wrap"><div class="pred-bar" style="width:{bar_w:.1f}%"></div></div>
-            <span class="pred-pct">{pct:.1f}%</span>
-        </div>"""
-
-    st.markdown(f"""
-    <div class="top5-title">Top 5 Predictions</div>
-    {rows_html}
-    """, unsafe_allow_html=True)
 
 else:
     # Empty state hint
