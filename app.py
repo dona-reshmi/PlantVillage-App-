@@ -3,7 +3,7 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
-st.set_page_config(page_title="Plant Disease Detection", layout="centered")
+st.set_page_config(page_title="Plant Disease Detection")
 
 # Load model
 model = tf.keras.models.load_model("plant_model.h5")
@@ -28,29 +28,34 @@ class_names = [
 
 st.title("Plant Disease Detection")
 
-uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Upload leaf image", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, use_column_width=True)
+
+    # 👇 Small image display (like your old version)
+    st.image(image, width=200)
 
     img = image.resize((224, 224))
     img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
 
-    with st.spinner("Predicting..."):
+    with st.spinner("Analyzing..."):
         prediction = model.predict(img_array)
 
     pred_index = np.argmax(prediction)
     predicted_class = class_names[pred_index]
-    confidence = prediction[0][pred_index]
+    confidence = prediction[0][pred_index] * 100
 
-    st.subheader(predicted_class)
-    st.caption(f"Confidence: {confidence*100:.2f}%")
+    # 👇 Clean result display
+    st.markdown("---")
+    st.subheader("Result")
+    st.write(f"**{predicted_class}**")
+    st.progress(int(confidence))
+    st.caption(f"Confidence: {confidence:.2f}%")
 
-    # Show top 3 predictions only (cleaner than full list)
-    st.markdown("Top Predictions:")
-    top3_idx = prediction[0].argsort()[-3:][::-1]
-
-    for i in top3_idx:
-        st.write(f"{class_names[i]} — {prediction[0][i]*100:.2f}%")
+    # 👇 Smart but simple insight (this is the “innovative touch”)
+    if confidence < 70:
+        st.info("Prediction confidence is low. Try uploading a clearer image.")
+    else:
+        st.success("Prediction looks reliable.")
